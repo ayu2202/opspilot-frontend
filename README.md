@@ -1,93 +1,50 @@
-# OpsPilot — Operations Platform Frontend
+# OpsPilot Frontend
 
-A modern, role-based operations management UI built with React and Tailwind CSS. Designed for streamlined work item tracking, operator assignment, and real-time status updates.
+Dashboard interface for managing internal task workflows. Built with React and Tailwind CSS.
 
 ---
 
-## Overview
+## UI Overview
 
-OpsPilot provides three role-specific dashboards behind JWT authentication:
+OpsPilot provides a clean, responsive dashboard for creating, assigning, and tracking operational tasks across teams. Users log in with role-based credentials and are routed to a view tailored to their responsibilities.
 
-| Role | Dashboard | Capabilities |
-|------|-----------|-------------|
-| **Admin** | `/admin` | View metrics, manage all work items, assign operators, load demo data |
-| **Operator** | `/operator` | View assigned tasks, update status (Start / Complete / Reject) |
-| **Viewer** | `/viewer` | Read-only overview of all work items |
+## Role-Based Views
 
-## Key UX Features
+- **Admin** — Assignment dashboard for managing all work items, viewing platform metrics, and assigning tasks to operators.
+- **Operator** — Execution panel for viewing assigned tasks and updating their status (Start, Complete, or Reject).
+- **Viewer** — Read-only insights into all work items and their current statuses.
 
-- **Inline updates** — Status changes and operator assignments update the row in-place without full page reloads.
-- **Per-row loading spinners** — Inline spinners appear on the control being acted on, keeping the rest of the UI interactive.
-- **Status badges with icons** — Color-coded badges (gray/blue/green/red) with contextual icons for OPEN, IN_PROGRESS, COMPLETED, and REJECTED.
-- **Smart assignment dropdown** — Shows the currently assigned operator as selected and disabled with a "(Currently Assigned)" label; prevents redundant API calls.
-- **Toast notifications** — Success/error toasts for actions like demo data loading.
-- **Empty states** — Intentional empty-state illustrations with helpful messages so the UI never looks broken with no data.
-- **Fade-in transitions** — Subtle page-enter animations for a polished feel.
-- **Full-screen overlay spinner** — Shown during login and initial auth verification.
+## UX Features
+
+- **Smooth task updates** — Status changes and operator assignments reflect inline without full page reloads.
+- **Role-based access** — JWT authentication with automatic routing per role; unauthorized paths are blocked.
+- **Real-time status visibility** — Color-coded status badges with icons (Open, In Progress, Completed, Rejected) update instantly on action.
+- **Toast notifications** — Contextual success/error feedback for user actions.
+- **Empty states** — Informative placeholders when no data is available so the UI always feels intentional.
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | React 19 (Create React App) |
-| Styling | Tailwind CSS 3.4 + @tailwindcss/forms |
-| HTTP | Axios with JWT interceptors |
-| Routing | React Router 7 |
-| Icons | Lucide React |
-
-## Project Structure
-
-```
-src/
-├── api/              # Axios instance, endpoint functions
-├── components/       # Layout, ProtectedRoute, LoadingSpinner, StatusBadge, Toast
-├── context/          # AuthContext (JWT + role state)
-├── contracts/        # API request builders & response parsers
-├── pages/            # LoginPage, AdminDashboard, OperatorDashboard, ViewerDashboard
-├── App.js            # Router + providers
-└── index.js          # Entry point
-```
+- **React** — Component-based UI framework
+- **Tailwind CSS** — Utility-first styling
+- **Axios** — HTTP client with JWT interceptors
 
 ## Backend Integration
 
-The frontend expects a Spring Boot backend running at `http://localhost:8080` with these endpoints:
-
-| Method | Endpoint | Used by |
-|--------|----------|---------|
-| POST | `/api/auth/login` | Login |
-| GET | `/api/admin/dashboard` | Admin metrics |
-| GET | `/api/admin/employees/operators` | Operator list |
-| GET | `/api/admin/workitems` | Admin work item table |
-| PUT | `/api/admin/workitems/:id/assign` | Assign operator |
-| POST | `/api/admin/demo-data` | Seed demo data |
-| GET | `/api/workitems/my/paginated` | Operator & Viewer items |
-| PUT | `/api/workitems/:id/status` | Status update |
-
-A centralized **contract layer** (`src/contracts/`) defines all request shapes and response parsers so the UI stays in sync with the API.
+Connects with the [OpsPilot Backend API](https://github.com/ayu2202/opspilot-backend) running on `http://localhost:8080`. A centralized contract layer keeps request/response shapes in sync with the API.
 
 ## Getting Started
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server (http://localhost:3000)
 npm start
-
-# Production build
-npm run build
 ```
+
+The app runs at [http://localhost:3000](http://localhost:3000).
 
 ## Demo Credentials
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | `admin@opspilot.com` | `admin123` |
-| Operator | `operator@opspilot.com` | `operator123` |
-| Viewer | `viewer@opspilot.com` | `viewer123` |
+| Admin | `admin1@opspilot.com` | `Password123` |
 
 > Use the **Load Demo Data** button on the Admin Dashboard to seed sample work items.
-
----
-
-**OpsPilot** &copy; 2026
