@@ -1,70 +1,93 @@
-# Getting Started with Create React App
+# OpsPilot — Operations Platform Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, role-based operations management UI built with React and Tailwind CSS. Designed for streamlined work item tracking, operator assignment, and real-time status updates.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Overview
 
-### `npm start`
+OpsPilot provides three role-specific dashboards behind JWT authentication:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+| Role | Dashboard | Capabilities |
+|------|-----------|-------------|
+| **Admin** | `/admin` | View metrics, manage all work items, assign operators, load demo data |
+| **Operator** | `/operator` | View assigned tasks, update status (Start / Complete / Reject) |
+| **Viewer** | `/viewer` | Read-only overview of all work items |
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Key UX Features
 
-### `npm test`
+- **Inline updates** — Status changes and operator assignments update the row in-place without full page reloads.
+- **Per-row loading spinners** — Inline spinners appear on the control being acted on, keeping the rest of the UI interactive.
+- **Status badges with icons** — Color-coded badges (gray/blue/green/red) with contextual icons for OPEN, IN_PROGRESS, COMPLETED, and REJECTED.
+- **Smart assignment dropdown** — Shows the currently assigned operator as selected and disabled with a "(Currently Assigned)" label; prevents redundant API calls.
+- **Toast notifications** — Success/error toasts for actions like demo data loading.
+- **Empty states** — Intentional empty-state illustrations with helpful messages so the UI never looks broken with no data.
+- **Fade-in transitions** — Subtle page-enter animations for a polished feel.
+- **Full-screen overlay spinner** — Shown during login and initial auth verification.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Tech Stack
 
-### `npm run build`
+| Layer | Technology |
+|-------|-----------|
+| Framework | React 19 (Create React App) |
+| Styling | Tailwind CSS 3.4 + @tailwindcss/forms |
+| HTTP | Axios with JWT interceptors |
+| Routing | React Router 7 |
+| Icons | Lucide React |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Project Structure
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+src/
+├── api/              # Axios instance, endpoint functions
+├── components/       # Layout, ProtectedRoute, LoadingSpinner, StatusBadge, Toast
+├── context/          # AuthContext (JWT + role state)
+├── contracts/        # API request builders & response parsers
+├── pages/            # LoginPage, AdminDashboard, OperatorDashboard, ViewerDashboard
+├── App.js            # Router + providers
+└── index.js          # Entry point
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Backend Integration
 
-### `npm run eject`
+The frontend expects a Spring Boot backend running at `http://localhost:8080` with these endpoints:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+| Method | Endpoint | Used by |
+|--------|----------|---------|
+| POST | `/api/auth/login` | Login |
+| GET | `/api/admin/dashboard` | Admin metrics |
+| GET | `/api/admin/employees/operators` | Operator list |
+| GET | `/api/admin/workitems` | Admin work item table |
+| PUT | `/api/admin/workitems/:id/assign` | Assign operator |
+| POST | `/api/admin/demo-data` | Seed demo data |
+| GET | `/api/workitems/my/paginated` | Operator & Viewer items |
+| PUT | `/api/workitems/:id/status` | Status update |
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+A centralized **contract layer** (`src/contracts/`) defines all request shapes and response parsers so the UI stays in sync with the API.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Getting Started
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+# Install dependencies
+npm install
 
-## Learn More
+# Start development server (http://localhost:3000)
+npm start
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# Production build
+npm run build
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Demo Credentials
 
-### Code Splitting
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@opspilot.com` | `admin123` |
+| Operator | `operator@opspilot.com` | `operator123` |
+| Viewer | `viewer@opspilot.com` | `viewer123` |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+> Use the **Load Demo Data** button on the Admin Dashboard to seed sample work items.
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**OpsPilot** &copy; 2026
