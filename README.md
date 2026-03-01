@@ -30,7 +30,7 @@ OpsPilot provides a clean, responsive dashboard for creating, assigning, and tra
 
 ## Backend Integration
 
-Connects with the [OpsPilot Backend API](https://github.com/ayu2202/opspilot-backend) running on `http://localhost:8080`. A centralized contract layer keeps request/response shapes in sync with the API.
+Connects with the [OpsPilot Backend API](https://github.com/ayu2202/opspilot-backend). The API base URL is configured via the `REACT_APP_API_BASE_URL` environment variable (defaults to `http://localhost:8080` for local dev). A centralized contract layer keeps request/response shapes in sync with the API.
 
 ## Getting Started
 
@@ -40,6 +40,16 @@ npm start
 ```
 
 The app runs at [http://localhost:3000](http://localhost:3000).
+
+### Deployment (Vercel + Render)
+
+1. Push to GitHub.
+2. Import the repo on [Vercel](https://vercel.com).
+3. Add the environment variable in Vercel project settings:
+   ```
+   REACT_APP_API_BASE_URL=https://your-backend.onrender.com
+   ```
+4. Deploy. Vercel handles SPA routing via `vercel.json`.
 
 ## Demo Credentials
 
