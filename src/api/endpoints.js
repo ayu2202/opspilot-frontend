@@ -1,4 +1,3 @@
-import axios from 'axios';
 import api from './axios';
 import {
   createLoginRequest,
@@ -11,57 +10,12 @@ import {
   parseEmployeeList,
 } from '../contracts';
 
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
-
-// ── Debug: Health Check ─────────────────────────────────────────────────────
-
-/** GET /actuator/health — temporary debug endpoint */
-export const checkBackendHealth = async () => {
-  const url = `${BASE_URL}/actuator/health`;
-  console.log('[HealthCheck] Calling:', url);
-  try {
-    const res = await axios.get(url, { timeout: 10000 });
-    console.log('[HealthCheck] Response:', res.status, res.data);
-    return { ok: true, status: res.status, data: res.data };
-  } catch (err) {
-    console.error('[HealthCheck] Error:', err);
-    if (err.code === 'ECONNABORTED') {
-      return { ok: false, message: 'Request timeout — backend may be sleeping or blocked.' };
-    }
-    if (!err.response) {
-      return { ok: false, message: 'Unable to reach backend. Check CORS or server status.' };
-    }
-    return { ok: false, message: `Backend responded with ${err.response.status}`, data: err.response.data };
-  }
-};
-
 // ── Auth ────────────────────────────────────────────────────────────────────
 
 /** POST /api/auth/login */
 export const login = async (email, password) => {
-  const loginUrl = BASE_URL + '/api/auth/login';
-  const payload = createLoginRequest(email, password);
-  console.log('[Login] Sending request to:', loginUrl);
-  console.log('[Login] Payload:', { email, password: '***' });
-  try {
-    const res = await api.post('/api/auth/login', payload, { timeout: 10000 });
-    console.log('[Login] Response status:', res.status);
-    console.log('[Login] Login success:', res.data);
-    return parseLoginResponse(res.data);
-  } catch (err) {
-    console.error('[Login] Login error:', err);
-    if (err.code === 'ECONNABORTED') {
-      const timeoutErr = new Error('Request timeout — backend may be sleeping or blocked.');
-      timeoutErr.isTimeout = true;
-      throw timeoutErr;
-    }
-    if (!err.response) {
-      const networkErr = new Error('Unable to reach backend. Check CORS or server status.');
-      networkErr.isNetworkError = true;
-      throw networkErr;
-    }
-    throw err;
-  }
+  const res = await api.post('/api/auth/login', createLoginRequest(email, password));
+  return parseLoginResponse(res.data);
 };
 
 // ── Admin ───────────────────────────────────────────────────────────────────

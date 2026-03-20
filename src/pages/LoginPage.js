@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { checkBackendHealth } from '../api/endpoints';
 import { OverlaySpinner } from '../components/LoadingSpinner';
 import {
   ShieldCheck,
@@ -15,9 +14,6 @@ import {
   GitBranch,
   Lock,
   BarChart3,
-  Wifi,
-  WifiOff,
-  Loader2,
 } from 'lucide-react';
 
 /* ── Credential quick-fill chip ──────────────────────────────────────────── */
@@ -69,15 +65,6 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // ── Health check state ──────────────────────────────────────────────────
-  const [healthStatus, setHealthStatus] = useState(null); // null | 'checking' | { ok, message }
-
-  const handleHealthCheck = async () => {
-    setHealthStatus('checking');
-    const result = await checkBackendHealth();
-    setHealthStatus(result);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -85,17 +72,11 @@ export default function LoginPage() {
     try {
       await login(email, password);
     } catch (err) {
-      if (err.isTimeout) {
-        setError(err.message);
-      } else if (err.isNetworkError) {
-        setError(err.message);
+      const data = err.response?.data;
+      if (data?.errors) {
+        setError(Object.values(data.errors).join('. '));
       } else {
-        const data = err.response?.data;
-        if (data?.errors) {
-          setError(Object.values(data.errors).join('. '));
-        } else {
-          setError(data?.message || 'Invalid credentials');
-        }
+        setError(data?.message || 'Invalid credentials');
       }
     } finally {
       setLoading(false);
@@ -181,38 +162,6 @@ export default function LoginPage() {
           <div className="flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-300/90">
             <Timer className="h-4 w-4 shrink-0" />
             Backend may take up to 30 seconds to wake up on first use.
-          </div>
-
-          {/* ── Debug: Backend Health Check ─────────────────────────────── */}
-          <div className="rounded-lg border border-slate-600/40 bg-slate-800/60 p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Backend Health Check</span>
-              <button
-                type="button"
-                onClick={handleHealthCheck}
-                disabled={healthStatus === 'checking'}
-                className="flex items-center gap-1.5 rounded-md bg-cyan-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-cyan-500 disabled:opacity-60"
-              >
-                {healthStatus === 'checking' ? (
-                  <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Checking…</>
-                ) : (
-                  <><Wifi className="h-3.5 w-3.5" /> Check Connection</>
-                )}
-              </button>
-            </div>
-            {healthStatus && healthStatus !== 'checking' && (
-              <div className={`mt-2 flex items-center gap-2 rounded-md px-3 py-2 text-xs ${
-                healthStatus.ok
-                  ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
-                  : 'bg-red-500/10 text-red-300 border border-red-500/20'
-              }`}>
-                {healthStatus.ok ? (
-                  <><Wifi className="h-3.5 w-3.5 shrink-0" /> Backend is reachable — status: {JSON.stringify(healthStatus.data)}.</>
-                ) : (
-                  <><WifiOff className="h-3.5 w-3.5 shrink-0" /> {healthStatus.message}</>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
