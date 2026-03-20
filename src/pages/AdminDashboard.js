@@ -8,6 +8,7 @@ import {
 } from '../api/endpoints';
 import { PageSpinner, InlineSpinner } from '../components/LoadingSpinner';
 import StatusBadge from '../components/StatusBadge';
+import AccessDenied from '../components/AccessDenied';
 import { useToast } from '../components/Toast';
 import {
   ClipboardList,
@@ -31,6 +32,7 @@ export default function AdminDashboard() {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [demoLoading, setDemoLoading] = useState(false);
+  const [forbidden, setForbidden] = useState(false);
   // Track which row is currently being assigned: { [workItemId]: true }
   const [assigningIds, setAssigningIds] = useState({});
 
@@ -46,8 +48,13 @@ export default function AdminDashboard() {
       setOperators(opsList);
       setItems(workItemPage.content);
       setTotalPages(workItemPage.totalPages);
+      setForbidden(false);
     } catch (err) {
-      console.error('Failed to load admin dashboard', err);
+      if (err.response?.status === 403) {
+        setForbidden(true);
+      } else {
+        console.error('Failed to load admin dashboard', err);
+      }
     } finally {
       setLoading(false);
     }
@@ -94,6 +101,7 @@ export default function AdminDashboard() {
   };
 
   if (loading) return <PageSpinner />;
+  if (forbidden) return <AccessDenied message="You do not have permission to access the admin dashboard." />;
 
   const summaryCards = [
     { label: 'Total Items', value: metrics?.totalWorkItems ?? 0, icon: ClipboardList, color: 'text-brand-500', bg: 'bg-brand-50' },

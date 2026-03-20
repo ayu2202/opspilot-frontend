@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { getAllWorkItems } from '../api/endpoints';
 import { PageSpinner } from '../components/LoadingSpinner';
 import StatusBadge from '../components/StatusBadge';
+import AccessDenied from '../components/AccessDenied';
 import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 
 export default function ViewerDashboard() {
@@ -9,6 +10,7 @@ export default function ViewerDashboard() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [forbidden, setForbidden] = useState(false);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -16,8 +18,13 @@ export default function ViewerDashboard() {
       const workItemPage = await getAllWorkItems(page, 10);
       setItems(workItemPage.content);
       setTotalPages(workItemPage.totalPages);
+      setForbidden(false);
     } catch (err) {
-      console.error('Failed to load items', err);
+      if (err.response?.status === 403) {
+        setForbidden(true);
+      } else {
+        console.error('Failed to load items', err);
+      }
     } finally {
       setLoading(false);
     }
@@ -28,6 +35,7 @@ export default function ViewerDashboard() {
   }, [fetchItems]);
 
   if (loading) return <PageSpinner />;
+  if (forbidden) return <AccessDenied message="You do not have permission to view work items. Please contact your administrator." />;
 
   return (
     <div className="space-y-6 animate-fade-in">

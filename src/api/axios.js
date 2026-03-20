@@ -14,7 +14,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Redirect to login on 401/403 (skip for auth endpoints)
+// Redirect to login on 401 (unauthenticated). 403 is handled per-component.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
