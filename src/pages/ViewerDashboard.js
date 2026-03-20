@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { getMyWorkItems } from '../api/endpoints';
+import { getAllWorkItems } from '../api/endpoints';
 import { PageSpinner } from '../components/LoadingSpinner';
 import StatusBadge from '../components/StatusBadge';
 import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
@@ -13,7 +13,7 @@ export default function ViewerDashboard() {
   const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
-      const workItemPage = await getMyWorkItems(page, 10);
+      const workItemPage = await getAllWorkItems(page, 10);
       setItems(workItemPage.content);
       setTotalPages(workItemPage.totalPages);
     } catch (err) {
